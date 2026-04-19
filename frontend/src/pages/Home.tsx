@@ -29,12 +29,16 @@ const Home = () => {
       params.append('page', String(filters.page));
       params.append('limit', '9');
       const { data } = await api.get(`/items?${params}`);
-      setItems(data.items);
-      setTotalPages(data.pages);
-      setTotal(data.total);
-    } catch {
+      setItems(data.items || []);
+      setTotalPages(data.pages || 1);
+      setTotal(data.total || 0);
+    } catch (error) {
+      console.error('Fetch items error:', error);
       setItems([]);
+      setTotalPages(1);
+      setTotal(0);
     } finally {
+
       setLoading(false);
     }
   }, [filters]);
