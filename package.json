@@ -1,0 +1,8 @@
+{
+  "name": "find-it-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
