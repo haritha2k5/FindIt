@@ -18,6 +18,10 @@ export interface Item {
   user_id: string;
   owner?: User;
   createdAt: string;
+  contact_info?: {
+    phone?: string;
+    email?: string;
+  };
 }
 
 export interface Claim {
