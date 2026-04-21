@@ -143,21 +143,40 @@ const ItemDetail = () => {
           </div>
 
           {/* Contact Info — only on lost items */}
-          {item.status === 'lost' && item.contact_info && (
+          {item.status === 'lost' && item.contact_info?.phone && (
             <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5">
+              
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <Phone size={15} className="text-blue-600" />
               </div>
+
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-blue-500 font-semibold uppercase tracking-wide mb-0.5">Found it? Call the owner directly</p>
-                <a href={`tel:${item.contact_info}`} className="text-blue-700 font-bold text-base hover:underline">
-                  {item.contact_info}
+                <p className="text-xs text-blue-500 font-semibold uppercase tracking-wide mb-0.5">
+                  Found it? Call the owner directly
+                </p>
+
+                <a
+                  href={`tel:${item.contact_info.phone}`}
+                  className="text-blue-700 font-bold text-base hover:underline"
+                >
+                  {item.contact_info.phone}
                 </a>
+
+                {/* Optional email display */}
+                {item.contact_info.email && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    {item.contact_info.email}
+                  </p>
+                )}
               </div>
-              <a href={`tel:${item.contact_info}`}
-                className="flex-shrink-0 bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">
+
+              <a
+                href={`tel:${item.contact_info.phone}`}
+                className="flex-shrink-0 bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition"
+              >
                 Call Now
               </a>
+
             </div>
           )}
 
