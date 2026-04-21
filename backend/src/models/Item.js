@@ -28,11 +28,20 @@ const Item = sequelize.define('Item', {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
+  // BUG FIX: status ENUM was ('pending','approved','rejected','claimed') which
+  // doesn't include 'lost' or 'found'. Frontend sends 'lost'/'found', causing
+  // Sequelize to throw a DB-level error → "Failed to create item".
+  // Correct values: lost, found, claimed.
+  // is_approved handles the approval workflow separately.
   status: {
-    type: DataTypes.ENUM('pending', 'approved','rejected', 'claimed'),
+    type: DataTypes.ENUM('lost', 'found', 'claimed'),
     allowNull: false,
   },
   image_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  contact_info: {
     type: DataTypes.STRING,
     allowNull: true,
   },

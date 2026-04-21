@@ -9,19 +9,28 @@ const createClaim = async (req, res) => {
 
     const item = await Item.findByPk(itemId);
     if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
-    if (!item.is_approved) return res.status(400).json({ success: false, message: 'Item is not approved yet' });
-    if (item.status !== 'found') {
-  return res.status(400).json({
-    success: false,
-    message: 'Only found items can be claimed'
-  });
-}
-    if (item.status === 'claimed') return res.status(400).json({ success: false, message: 'Item already claimed' });
+
+    if (!item.is_approved) {
+      return res.status(400).json({ success: false, message: 'Item is not approved yet' });
+    }
+
+    // BUG FIX: original code blocked claims on lost items with:
+    //   if (item.status !== 'found') return error
+    // This is wrong. Both lost and found items can be claimed:
+    //   - FOUND item: someone else lost it and wants to claim it back
+    //   - LOST item: someone found it and wants to report that they have it
+    // Only truly claimed (already resolved) items should block new claims.
+    if (item.status === 'claimed') {
+      return res.status(400).json({ success: false, message: 'This item has already been claimed' });
+    }
+
     if (item.user_id === req.user.id) {
       return res.status(400).json({ success: false, message: 'You cannot claim your own item' });
     }
 
-    const existingClaim = await Claim.findOne({ where: { item_id: itemId, claimant_id: req.user.id } });
+    const existingClaim = await Claim.findOne({
+      where: { item_id: itemId, claimant_id: req.user.id },
+    });
     if (existingClaim) {
       return res.status(409).json({ success: false, message: 'You already submitted a claim for this item' });
     }
@@ -108,6 +117,7 @@ const updateClaimStatus = async (req, res) => {
 
     await claim.update({ status });
 
+    // When a claim is approved, mark the item as claimed so no new claims come in
     if (status === 'approved') {
       await claim.item.update({ status: 'claimed' });
     }
